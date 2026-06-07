@@ -128,6 +128,9 @@ export default function CarsPage() {
     e.preventDefault();
     if (!nickname || !origin || !departureTime || !destination) return;
     
+    // Asegurar que el perfil existe en la BD (por si el usuario borró las tablas pero sigue logueado en el navegador)
+    await supabase.from('profiles').upsert({ nickname }).select();
+
     const validStops = stops.filter(s => s.trim() !== '');
 
     const { data: newCar, error } = await supabase.from('cars').insert({
@@ -164,6 +167,9 @@ export default function CarsPage() {
   const handleAddRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nickname || !reqLocation) return;
+
+    // Asegurar que el perfil existe en la BD
+    await supabase.from('profiles').upsert({ nickname }).select();
 
     const { error } = await supabase.from('ride_requests').insert({
       user_nickname: nickname,
