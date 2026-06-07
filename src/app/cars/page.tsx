@@ -123,12 +123,26 @@ export default function CarsPage() {
     setShowCarForm(true);
   };
 
+  // --- Helper: encode/decode extra fields into pick_up_points (JSON) ---
+  const encodeExtra = (dir: string, stopsArr: string[], accStops: boolean) =>
+    JSON.stringify({ direction: dir, stops: stopsArr, accepts_stops: accStops });
+
+  const decodeExtra = (car: any) => {
+    try {
+      const parsed = car.pick_up_points ? JSON.parse(car.pick_up_points) : {};
+      return {
+        direction: parsed.direction || 'ida',
+        stops: parsed.stops || [],
+        accepts_stops: parsed.accepts_stops !== false,
+      };
+    } catch { return { direction: 'ida', stops: [] as string[], accepts_stops: true }; }
+  };
+
   // --- Submits ---
   const handleAddCar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nickname || !origin || !departureTime || !destination) return;
     
-    // Asegurar que el perfil existe en la BD (por si el usuario borró las tablas pero sigue logueado en el navegador)
     await supabase.from('profiles').upsert({ nickname }).select();
 
     const validStops = stops.filter(s => s.trim() !== '');
@@ -136,13 +150,12 @@ export default function CarsPage() {
     const { data: newCar, error } = await supabase.from('cars').insert({
       driver: nickname,
       total_seats: totalSeats,
-      available_seats: totalSeats - 1, // Driver takes 1
-      direction: carDirection,
+      available_seats: totalSeats - 1,
       origin,
       destination,
-      stops: validStops,
-      accepts_stops: acceptsStops,
       departure_time: departureTime,
+      return_time: departureTime, // Required NOT NULL in DB
+      pick_up_points: encodeExtra(carDirection, validStops, acceptsStops),
       passengers: [nickname],
     }).select().single();
     
@@ -152,12 +165,9 @@ export default function CarsPage() {
       return;
     }
 
-    // If we were pre-filling from a request, we auto-accept that request into this new car
     if (preFillRequestId && newCar) {
       const req = requests.find(r => r.id === preFillRequestId);
-      if (req) {
-        await acceptRequestIntoCar(req, newCar);
-      }
+      if (req) await acceptRequestIntoCar(req, newCar);
     }
 
     setShowCarForm(false);
@@ -220,14 +230,11 @@ export default function CarsPage() {
 
   // --- Matchmaking Engine ---
   const handleCarryPerson = (req: any) => {
-    // Check condition A: User has a compatible active trip
-    const compatibleCar = cars.find(c => c.driver === nickname && c.direction === req.direction && c.available_seats > 0);
+    const compatibleCar = cars.find(c => c.driver === nickname && decodeExtra(c).direction === req.direction && c.available_seats > 0);
     
     if (compatibleCar) {
-      // Condition A -> Alert Modal
       setConfirmMatch({ show: true, request: req, matchingCar: compatibleCar });
     } else {
-      // Condition B -> No compatible trip -> Pre-fill creation modal
       const confirmText = "No tienes un viaje publicado en esta dirección. Para llevarla, añade el trayecto. ¿Quieres crearlo ahora?";
       if (window.confirm(confirmText)) {
         openCarForm({ direction: req.direction, location: req.location, reqId: req.id });
@@ -236,19 +243,18 @@ export default function CarsPage() {
   };
 
   const acceptRequestIntoCar = async (req: any, car: any) => {
-    // Add passenger
     const newPassengers = [...car.passengers, req.user_nickname];
+    const extra = decodeExtra(car);
     
-    // Inject location into stops if not already there and if accepts_stops
-    let newStops = car.stops || [];
-    if (car.accepts_stops && !newStops.includes(req.location) && req.location !== car.origin && req.location !== car.destination) {
+    let newStops = extra.stops || [];
+    if (extra.accepts_stops && !newStops.includes(req.location) && req.location !== car.origin && req.location !== car.destination) {
       newStops = [...newStops, req.location];
     }
 
     await supabase.from('cars').update({
       passengers: newPassengers,
       available_seats: car.available_seats - 1,
-      stops: newStops
+      pick_up_points: encodeExtra(extra.direction, newStops, extra.accepts_stops)
     }).eq('id', car.id);
 
     await supabase.from('ride_requests').update({ status: 'accepted' }).eq('id', req.id);
@@ -311,12 +317,13 @@ export default function CarsPage() {
           {cars.map((car) => {
             const isPassenger = car.passengers?.includes(nickname);
             const isDriver = car.driver === nickname;
+            const extra = decodeExtra(car);
 
             return (
               <div key={car.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl flex flex-col overflow-hidden hover:border-zinc-700 transition-colors relative group">
                 
                 {/* Accepts Stops Badge */}
-                {!car.accepts_stops && (
+                {!extra.accepts_stops && (
                   <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-zinc-950/80 backdrop-blur border border-red-500/30 text-red-400 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider" title="Itinerario Cerrado: No acepta desvíos">
                     <Lock size={10} /> Cerrado
                   </div>
@@ -341,8 +348,8 @@ export default function CarsPage() {
                       <span className="text-[11px] font-bold">{car.available_seats} huecos</span>
                     </div>
                     <div className="px-2.5 py-1 rounded-full border border-zinc-700 bg-zinc-800/50 flex items-center gap-1.5">
-                      {car.direction === 'ida' ? <ArrowRight size={12} className="text-indigo-400"/> : <ArrowLeft size={12} className="text-pink-400"/>}
-                      <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">{car.direction}</span>
+                      {extra.direction === 'ida' ? <ArrowRight size={12} className="text-indigo-400"/> : <ArrowLeft size={12} className="text-pink-400"/>}
+                      <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">{extra.direction}</span>
                     </div>
                   </div>
                 </div>
@@ -360,7 +367,7 @@ export default function CarsPage() {
                     </div>
 
                     {/* Stops */}
-                    {car.stops?.map((stop: string, idx: number) => (
+                    {extra.stops?.map((stop: string, idx: number) => (
                       <div key={idx} className="relative mb-6">
                         <div className="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-zinc-600 border-[2px] border-zinc-900 z-10" />
                         <span className="text-sm font-medium text-zinc-300">{stop}</span>
