@@ -157,54 +157,49 @@ export default function FoodPage() {
                   {/* Accumulated totals — gradient text, centered */}
                   {participants.length > 0 && (
                     <p className="mt-2 text-sm font-bold bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">
-                      {totalQuantity} {item.unit_type} · {totalPrice.toFixed(2)}€ total
+                      Total acumulado (por ahora): {totalQuantity} {item.unit_type} - {totalPrice.toFixed(2)}€
                     </p>
                   )}
-                  <div className="text-xs text-zinc-500 mt-1.5 flex items-center gap-2">
-                    <span>Añadido por {item.added_by}</span>
-                    {participants.length > 0 && (
-                      <>
-                        <span>•</span>
-                        <button 
-                          onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
-                          className="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-95"
-                        >
-                          <Users size={12} />
-                          {participants.length} apuntado{participants.length !== 1 ? 's' : ''}
-                          <ChevronDown size={12} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                        </button>
-                      </>
-                    )}
-                    {participants.length === 0 && (
-                      <>
-                        <span>•</span>
-                        <span className="text-zinc-600">0 apuntados</span>
-                      </>
+                  <div className="text-xs text-zinc-500 mt-2 flex items-center gap-2">
+                    {participants.length > 0 ? (
+                      <button 
+                        onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
+                        className="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-95"
+                      >
+                        <Users size={12} />
+                        {participants.length} apuntado{participants.length !== 1 ? 's' : ''}
+                        <ChevronDown size={12} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                      </button>
+                    ) : (
+                      <span className="text-zinc-600">0 apuntados</span>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                  {imIn ? (
-                    <button 
-                      onClick={(e) => cancelCunde(item.id, e)}
-                      className="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition-colors"
-                    >
-                      Ya no me cunde
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => { setActiveCundeId(isCundeActive ? null : item.id); setCundeQuantity(''); }}
-                      className="text-xs bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-3 py-1.5 rounded-lg shadow-sm shadow-indigo-500/20 transition-all active:scale-95 font-bold"
-                    >
-                      Me cunde
-                    </button>
-                  )}
-                  {item.added_by === nickname && (
-                    <button onClick={(e) => deleteShoppingItem(item.id, e)} className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
-                      <Trash2 size={16} />
-                    </button>
-                  )}
+                <div className="flex flex-col items-end gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-2">
+                    {imIn ? (
+                      <button 
+                        onClick={(e) => cancelCunde(item.id, e)}
+                        className="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg hover:bg-red-500/20 transition-colors"
+                      >
+                        Ya no me cunde
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => { setActiveCundeId(isCundeActive ? null : item.id); setCundeQuantity(''); }}
+                        className="text-xs bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-3 py-1.5 rounded-lg shadow-sm shadow-indigo-500/20 transition-all active:scale-95 font-bold"
+                      >
+                        Me cunde
+                      </button>
+                    )}
+                    {item.added_by === nickname && (
+                      <button onClick={(e) => deleteShoppingItem(item.id, e)} className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-zinc-500">Añadido por {item.added_by}</span>
                 </div>
               </div>
 
