@@ -148,7 +148,7 @@ export default function CarsPage() {
     
     if (error) {
       console.error(error);
-      displayToast('Error de Base de Datos. ¿Has actualizado supabase-schema.sql?', true);
+      displayToast(`Error DB: ${error.message} (Code: ${error.code})`, true);
       return;
     }
 
@@ -181,7 +181,7 @@ export default function CarsPage() {
 
     if (error) {
       console.error(error);
-      displayToast('Error al publicar solicitud. Verifica la BD.', true);
+      displayToast(`Error DB: ${error.message} (Code: ${error.code})`, true);
       return;
     }
 
