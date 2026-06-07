@@ -221,11 +221,23 @@ export default function CarsPage() {
   };
 
   const deleteCar = async (carId: string) => {
-    await supabase.from('cars').delete().eq('id', carId);
+    const { error } = await supabase.from('cars').delete().eq('id', carId);
+    if (error) {
+      console.error(error);
+      displayToast(`Error: No tienes permisos para borrar.`, true);
+    } else {
+      displayToast('Viaje borrado con éxito');
+    }
   };
 
   const deleteRequest = async (reqId: string) => {
-    await supabase.from('ride_requests').delete().eq('id', reqId);
+    const { error } = await supabase.from('ride_requests').delete().eq('id', reqId);
+    if (error) {
+      console.error(error);
+      displayToast(`Error al borrar solicitud.`, true);
+    } else {
+      displayToast('Solicitud borrada');
+    }
   };
 
   // --- Matchmaking Engine ---
