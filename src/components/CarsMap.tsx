@@ -71,7 +71,7 @@ export default function CarsMap({ cars }: { cars: any[] }) {
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={center}
-        zoom={6}
+        zoom={9}
         options={{
           styles: nightModeStyles,
           disableDefaultUI: true,
