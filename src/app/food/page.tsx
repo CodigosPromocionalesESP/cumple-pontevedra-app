@@ -265,13 +265,13 @@ export default function FoodPage() {
       <div className="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800">
         <button 
           onClick={() => setActiveTab('meals')}
-          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'meals' ? 'bg-zinc-800 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'meals' ? 'bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-md shadow-indigo-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           <UtensilsCrossed size={16} /> Plan de Comidas
         </button>
         <button 
           onClick={() => setActiveTab('shopping')}
-          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'shopping' ? 'bg-zinc-800 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'shopping' ? 'bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-md shadow-indigo-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           <ShoppingCart size={16} /> Lista de la Compra
         </button>

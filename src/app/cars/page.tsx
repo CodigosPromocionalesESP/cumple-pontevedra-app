@@ -304,17 +304,17 @@ export default function CarsPage() {
       <div className="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800">
         <button 
           onClick={() => setActiveTab('available')}
-          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'available' ? 'bg-zinc-800 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'available' ? 'bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-md shadow-indigo-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           Viajes Disponibles
         </button>
         <button 
           onClick={() => setActiveTab('requests')}
-          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'requests' ? 'bg-zinc-800 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'requests' ? 'bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-md shadow-indigo-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           Buscando Viaje
           {requests.filter(r => r.status === 'pending').length > 0 && (
-            <span className="bg-pink-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{requests.filter(r => r.status === 'pending').length}</span>
+            <span className={`${activeTab === 'requests' ? 'bg-white/20 text-white' : 'bg-pink-500 text-white'} text-[10px] px-1.5 py-0.5 rounded-full transition-colors`}>{requests.filter(r => r.status === 'pending').length}</span>
           )}
         </button>
       </div>
