@@ -5,9 +5,9 @@ import { useStore } from '@/store/useStore';
 import { Users, Clock, Plus, X, Trash2, Lock, ArrowRight, ArrowLeft, Hand } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-function Toast({ message, show }: { message: string, show: boolean }) {
+function Toast({ message, isError = false, show }: { message: string, isError?: boolean, show: boolean }) {
   return (
-    <div className={`fixed bottom-4 right-4 bg-emerald-900 border border-emerald-500 text-emerald-100 px-4 py-3 rounded-xl shadow-lg transition-all duration-300 z-50 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+    <div className={`fixed top-20 right-4 ${isError ? 'bg-red-900 border-red-500 text-red-100' : 'bg-emerald-900 border-emerald-500 text-emerald-100'} border px-4 py-3 rounded-xl shadow-lg transition-all duration-300 z-[100] ${show ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
       {message}
     </div>
   );
@@ -28,11 +28,13 @@ export default function CarsPage() {
   // Toast state
   const [toastMsg, setToastMsg] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [isToastError, setIsToastError] = useState(false);
 
-  const displayToast = (msg: string) => {
+  const displayToast = (msg: string, isError = false) => {
     setToastMsg(msg);
+    setIsToastError(isError);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+    setTimeout(() => setShowToast(false), 4000);
   };
 
   // --- Car Form State ---
@@ -128,7 +130,7 @@ export default function CarsPage() {
     
     const validStops = stops.filter(s => s.trim() !== '');
 
-    const { data: newCar } = await supabase.from('cars').insert({
+    const { data: newCar, error } = await supabase.from('cars').insert({
       driver: nickname,
       total_seats: totalSeats,
       available_seats: totalSeats - 1, // Driver takes 1
@@ -141,6 +143,12 @@ export default function CarsPage() {
       passengers: [nickname],
     }).select().single();
     
+    if (error) {
+      console.error(error);
+      displayToast('Error de Base de Datos. ¿Has actualizado supabase-schema.sql?', true);
+      return;
+    }
+
     // If we were pre-filling from a request, we auto-accept that request into this new car
     if (preFillRequestId && newCar) {
       const req = requests.find(r => r.id === preFillRequestId);
@@ -157,13 +165,19 @@ export default function CarsPage() {
     e.preventDefault();
     if (!nickname || !reqLocation) return;
 
-    await supabase.from('ride_requests').insert({
+    const { error } = await supabase.from('ride_requests').insert({
       user_nickname: nickname,
       direction: reqDirection,
       location: reqLocation,
       proposed_price: reqPrice ? parseFloat(reqPrice) : 0,
       status: 'pending'
     });
+
+    if (error) {
+      console.error(error);
+      displayToast('Error al publicar solicitud. Verifica la BD.', true);
+      return;
+    }
 
     setShowRequestForm(false);
     setReqLocation('');
@@ -239,7 +253,7 @@ export default function CarsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <Toast message={toastMsg} show={showToast} />
+      <Toast message={toastMsg} isError={isToastError} show={showToast} />
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

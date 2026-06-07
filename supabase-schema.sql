@@ -7,7 +7,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- (Ignoramos coches, comidas y gastos que ya estaban creados)
+-- BORRAMOS LAS TABLAS ANTERIORES PARA APLICAR LOS NUEVOS CAMPOS
+DROP TABLE IF EXISTS public.cars CASCADE;
+DROP TABLE IF EXISTS public.ride_requests CASCADE;
+
 CREATE TABLE IF NOT EXISTS public.cars (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   driver text REFERENCES public.profiles(nickname) NOT NULL,
