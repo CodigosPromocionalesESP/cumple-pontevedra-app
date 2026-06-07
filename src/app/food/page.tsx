@@ -262,16 +262,24 @@ export default function FoodPage() {
         <p className="text-zinc-400">Organiza los menús y la lista de la compra colaborativa.</p>
       </div>
 
-      <div className="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800">
+      <div className="relative flex bg-zinc-900 p-1 rounded-xl border border-zinc-800 isolate">
+        {/* Animated Background Indicator */}
+        <div 
+          className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-gradient-to-r from-indigo-600 to-pink-500 rounded-lg shadow-md shadow-indigo-500/20 transition-transform duration-300 ease-out z-0"
+          style={{
+            transform: activeTab === 'meals' ? 'translateX(0)' : 'translateX(100%)'
+          }}
+        />
+
         <button 
           onClick={() => setActiveTab('meals')}
-          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'meals' ? 'bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-md shadow-indigo-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors duration-300 relative z-10 ${activeTab === 'meals' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           <UtensilsCrossed size={16} /> Plan de Comidas
         </button>
         <button 
           onClick={() => setActiveTab('shopping')}
-          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'shopping' ? 'bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-md shadow-indigo-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors duration-300 relative z-10 ${activeTab === 'shopping' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           <ShoppingCart size={16} /> Lista de la Compra
         </button>
