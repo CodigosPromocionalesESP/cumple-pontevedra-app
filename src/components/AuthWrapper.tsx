@@ -2,6 +2,7 @@
 
 import { useStore } from '@/store/useStore';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function AuthWrapper({ children }: { children: React.ReactNode }) {
   const { nickname, setNickname } = useStore();
@@ -22,10 +23,13 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
           <p className="text-zinc-400 mb-8">Introduce tu nickname para organizarnos.</p>
           
           <form 
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              if (inputName.trim().length > 2) {
-                setNickname(inputName.trim());
+              const name = inputName.trim();
+              if (name.length > 2) {
+                // Insert into Supabase (ignore error if exists)
+                await supabase.from('profiles').upsert({ nickname: name }, { onConflict: 'nickname' });
+                setNickname(name);
               }
             }}
             className="space-y-4"
