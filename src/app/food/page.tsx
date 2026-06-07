@@ -167,11 +167,11 @@ export default function FoodPage() {
                         <span>•</span>
                         <button 
                           onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
-                          className="flex items-center gap-1 text-indigo-400 font-medium hover:text-indigo-300 transition-colors"
+                          className="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-95"
                         >
                           <Users size={12} />
                           {participants.length} apuntado{participants.length !== 1 ? 's' : ''}
-                          {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                          <ChevronDown size={12} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                         </button>
                       </>
                     )}
