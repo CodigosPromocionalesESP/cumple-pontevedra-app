@@ -46,7 +46,7 @@ export default function CarsMap({ cars }: { cars: any[] }) {
     googleMapsApiKey: apiKey,
   });
 
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState<any>(null);
 
   if (!apiKey) {
     return (
