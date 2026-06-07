@@ -1,15 +1,20 @@
 -- Copia y pega esto en el SQL Editor de tu proyecto Supabase para crear/actualizar las tablas necesarias
 
+-- 0. LIMPIEZA TOTAL (Para evitar conflictos de schema en desarrollo)
+DROP TABLE IF EXISTS public.shopping_list_participants CASCADE;
+DROP TABLE IF EXISTS public.shopping_list CASCADE;
+DROP TABLE IF EXISTS public.expenses CASCADE;
+DROP TABLE IF EXISTS public.meals CASCADE;
+DROP TABLE IF EXISTS public.ride_requests CASCADE;
+DROP TABLE IF EXISTS public.cars CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
+
 -- 1. CREACIÓN DE TABLAS
 CREATE TABLE IF NOT EXISTS public.profiles (
   nickname text PRIMARY KEY,
-  avatar_url text, -- Nuevo campo
+  avatar_url text,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
-
--- BORRAMOS LAS TABLAS ANTERIORES PARA APLICAR LOS NUEVOS CAMPOS
-DROP TABLE IF EXISTS public.cars CASCADE;
-DROP TABLE IF EXISTS public.ride_requests CASCADE;
 
 CREATE TABLE IF NOT EXISTS public.cars (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -55,9 +60,6 @@ CREATE TABLE IF NOT EXISTS public.expenses (
 );
 
 -- RECREACIÓN DE LA LISTA DE LA COMPRA PARA SOPORTAR PARTICIPANTES
-DROP TABLE IF EXISTS public.shopping_list_participants CASCADE;
-DROP TABLE IF EXISTS public.shopping_list CASCADE;
-
 CREATE TABLE public.shopping_list (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   category text NOT NULL DEFAULT 'comida', -- 'comida' | 'bebida'
