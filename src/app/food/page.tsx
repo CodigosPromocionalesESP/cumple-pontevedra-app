@@ -153,13 +153,13 @@ export default function FoodPage() {
                     <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">
                       {item.base_price}€ / {item.unit_type}
                     </span>
-                    {/* Accumulated totals badge */}
-                    {participants.length > 0 && (
-                      <span className="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full font-medium">
-                        {totalQuantity} {item.unit_type} · {totalPrice.toFixed(2)}€
-                      </span>
-                    )}
                   </div>
+                  {/* Accumulated totals — gradient text, centered */}
+                  {participants.length > 0 && (
+                    <p className="mt-2 text-sm font-bold bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">
+                      {totalQuantity} {item.unit_type} · {totalPrice.toFixed(2)}€ total
+                    </p>
+                  )}
                   <div className="text-xs text-zinc-500 mt-1.5 flex items-center gap-2">
                     <span>Añadido por {item.added_by}</span>
                     {participants.length > 0 && (
@@ -195,7 +195,7 @@ export default function FoodPage() {
                   ) : (
                     <button 
                       onClick={() => { setActiveCundeId(isCundeActive ? null : item.id); setCundeQuantity(''); }}
-                      className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors"
+                      className="text-xs bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-3 py-1.5 rounded-lg shadow-sm shadow-indigo-500/20 transition-all active:scale-95 font-bold"
                     >
                       Me cunde
                     </button>
@@ -228,7 +228,7 @@ export default function FoodPage() {
                       </strong>
                     </div>
                     <button onClick={() => setActiveCundeId(null)} className="text-xs px-3 py-1.5 text-zinc-400 hover:text-zinc-200 transition-colors">Cancelar</button>
-                    <button onClick={() => confirmCunde(item.id)} className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg font-medium transition-colors">Confirmar</button>
+                    <button onClick={() => confirmCunde(item.id)} className="text-xs bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-4 py-1.5 rounded-lg font-bold shadow-sm shadow-indigo-500/20 transition-all active:scale-95">Confirmar</button>
                   </div>
                 </div>
               )}
@@ -298,7 +298,7 @@ export default function FoodPage() {
                   </div>
                   <button 
                     onClick={() => toggleMealAttendance(meal)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${imIn ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-600/30' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}>
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 ${imIn ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-600/30' : 'bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40'}`}>
                     {imIn ? 'Apuntado ✓' : 'Yo me apunto'}
                   </button>
                 </div>

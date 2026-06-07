@@ -75,7 +75,7 @@ export default function ExpensesPage() {
         </div>
         <h2 className="text-sm font-medium text-indigo-300/80 uppercase tracking-wider mb-2">Resumen Total</h2>
         <div className="flex items-end gap-4 mb-4">
-          <span className="text-4xl font-bold text-white">{totalSpent.toFixed(2)}€</span>
+          <span className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">{totalSpent.toFixed(2)}€</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-zinc-300 bg-black/20 w-max px-3 py-1.5 rounded-lg border border-white/5">
           <span>Tocamos a</span>
@@ -88,7 +88,7 @@ export default function ExpensesPage() {
         <h2 className="text-xl font-semibold text-zinc-100">Gastos Registrados</h2>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition-all text-sm font-medium"
+          className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-4 py-2 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all text-sm font-medium active:scale-95"
         >
           <Plus size={16} /> Añadir Gasto
         </button>
@@ -113,7 +113,7 @@ export default function ExpensesPage() {
             </div>
             <div className="flex justify-end gap-3 mt-4">
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-zinc-400 hover:text-zinc-200 text-sm font-medium">Cancelar</button>
-              <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">Guardar</button>
+              <button type="submit" className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white rounded-lg text-sm font-medium shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-95">Guardar</button>
             </div>
           </form>
         </div>

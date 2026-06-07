@@ -79,7 +79,7 @@ export default function CarsPage() {
         <h2 className="text-xl font-semibold text-zinc-100">Lista de Coches</h2>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition-all text-sm font-medium"
+          className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-4 py-2 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all text-sm font-medium active:scale-95"
         >
           <Plus size={16} />
           Añadir Coche
@@ -116,7 +116,7 @@ export default function CarsPage() {
             </div>
             <div className="flex justify-end gap-3 mt-4">
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-zinc-400 hover:text-zinc-200 text-sm font-medium">Cancelar</button>
-              <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">Guardar Coche</button>
+              <button type="submit" className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white rounded-lg text-sm font-medium shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-95">Guardar Coche</button>
             </div>
           </form>
         </div>
@@ -159,10 +159,13 @@ export default function CarsPage() {
               <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Pasajeros</p>
               <div className="flex flex-wrap gap-2">
                 {car.passengers?.map((p: string, i: number) => (
-                  <span key={i} className="bg-zinc-800 px-2.5 py-1 rounded-md text-xs text-zinc-300">{p}</span>
+                  <div key={i} className="flex items-center gap-1.5 bg-zinc-800 px-2.5 py-1 rounded-md">
+                    <img src={`https://api.dicebear.com/9.x/notionists/svg?seed=${p}`} alt={p} className="w-4 h-4 rounded-full" />
+                    <span className="text-xs text-zinc-300">{p}</span>
+                  </div>
                 ))}
                 {car.available_seats > 0 && !car.passengers?.includes(nickname) && (
-                  <button onClick={() => joinCar(car)} className="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white px-2.5 py-1 rounded-md text-xs font-medium transition-all">
+                  <button onClick={() => joinCar(car)} className="bg-gradient-to-r from-indigo-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white px-3 py-1 rounded-md text-xs font-bold shadow-sm shadow-indigo-500/20 transition-all active:scale-95">
                     + Unirme
                   </button>
                 )}
