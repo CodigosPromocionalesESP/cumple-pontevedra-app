@@ -13,13 +13,25 @@ CREATE TABLE IF NOT EXISTS public.cars (
   driver text REFERENCES public.profiles(nickname) NOT NULL,
   total_seats integer NOT NULL,
   available_seats integer NOT NULL,
+  direction text NOT NULL DEFAULT 'ida', -- 'ida' o 'vuelta'
   origin text NOT NULL,
   stops text[] DEFAULT array[]::text[],
   destination text DEFAULT 'Casa César' NOT NULL,
+  accepts_stops boolean DEFAULT true NOT NULL,
   departure_time time without time zone NOT NULL,
-  return_time time without time zone NOT NULL,
+  return_time time without time zone, -- Make optional or handle per direction
   pick_up_points text,
   passengers text[] DEFAULT array[]::text[],
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.ride_requests (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_nickname text REFERENCES public.profiles(nickname) NOT NULL,
+  direction text NOT NULL, -- 'ida' o 'vuelta'
+  location text NOT NULL,
+  proposed_price numeric(10,2) DEFAULT 0,
+  status text DEFAULT 'pending' NOT NULL, -- 'pending' o 'accepted'
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -80,11 +92,15 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'expenses') THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE expenses;
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'ride_requests') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE ride_requests;
+  END IF;
 END $$;
 
 -- 3. HABILITAR RLS Y MEDIDAS DE SEGURIDAD EXTREMAS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cars ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ride_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.meals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shopping_list ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shopping_list_participants ENABLE ROW LEVEL SECURITY;
@@ -97,6 +113,11 @@ DROP POLICY IF EXISTS "Inserción pública" ON public.profiles;
 DROP POLICY IF EXISTS "Lectura pública" ON public.cars;
 DROP POLICY IF EXISTS "Inserción pública" ON public.cars;
 DROP POLICY IF EXISTS "Actualización pública" ON public.cars;
+
+DROP POLICY IF EXISTS "Lectura pública" ON public.ride_requests;
+DROP POLICY IF EXISTS "Inserción pública" ON public.ride_requests;
+DROP POLICY IF EXISTS "Actualización pública" ON public.ride_requests;
+DROP POLICY IF EXISTS "Borrado creador" ON public.ride_requests;
 
 DROP POLICY IF EXISTS "Lectura pública" ON public.meals;
 DROP POLICY IF EXISTS "Inserción pública" ON public.meals;
@@ -118,6 +139,7 @@ DROP POLICY IF EXISTS "Borrado participante" ON public.shopping_list_participant
 -- POLÍTICAS DE LECTURA
 CREATE POLICY "Lectura pública" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Lectura pública" ON public.cars FOR SELECT USING (true);
+CREATE POLICY "Lectura pública" ON public.ride_requests FOR SELECT USING (true);
 CREATE POLICY "Lectura pública" ON public.meals FOR SELECT USING (true);
 CREATE POLICY "Lectura pública" ON public.shopping_list FOR SELECT USING (true);
 CREATE POLICY "Lectura pública" ON public.shopping_list_participants FOR SELECT USING (true);
@@ -140,3 +162,8 @@ CREATE POLICY "Actualización pública" ON public.shopping_list_participants FOR
 -- POLÍTICAS DE BORRADO (Solo para lista de la compra según requerimiento)
 CREATE POLICY "Borrado creador" ON public.shopping_list FOR DELETE USING (true);
 CREATE POLICY "Borrado participante" ON public.shopping_list_participants FOR DELETE USING (true);
+
+-- POLÍTICAS PARA RIDE_REQUESTS
+CREATE POLICY "Inserción pública" ON public.ride_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Actualización pública" ON public.ride_requests FOR UPDATE USING (true);
+CREATE POLICY "Borrado creador" ON public.ride_requests FOR DELETE USING (true);
