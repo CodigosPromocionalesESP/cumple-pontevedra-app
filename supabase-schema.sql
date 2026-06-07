@@ -89,7 +89,21 @@ ALTER TABLE public.shopping_list ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shopping_list_participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
 
--- Limpiar políticas de las nuevas tablas
+-- Limpiar políticas anteriores de todas las tablas por si acaso
+DROP POLICY IF EXISTS "Lectura pública" ON public.profiles;
+DROP POLICY IF EXISTS "Inserción pública" ON public.profiles;
+
+DROP POLICY IF EXISTS "Lectura pública" ON public.cars;
+DROP POLICY IF EXISTS "Inserción pública" ON public.cars;
+DROP POLICY IF EXISTS "Actualización pública" ON public.cars;
+
+DROP POLICY IF EXISTS "Lectura pública" ON public.meals;
+DROP POLICY IF EXISTS "Inserción pública" ON public.meals;
+DROP POLICY IF EXISTS "Actualización pública" ON public.meals;
+
+DROP POLICY IF EXISTS "Lectura pública" ON public.expenses;
+DROP POLICY IF EXISTS "Inserción pública" ON public.expenses;
+
 DROP POLICY IF EXISTS "Lectura pública" ON public.shopping_list;
 DROP POLICY IF EXISTS "Inserción pública" ON public.shopping_list;
 DROP POLICY IF EXISTS "Actualización pública" ON public.shopping_list;
