@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthWrapper from "@/components/AuthWrapper";
 import Navbar from "@/components/Navbar";
 import Countdown from "@/components/Countdown";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Cumple Pontevedra",
@@ -28,7 +17,8 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-zinc-50 min-h-screen flex flex-col`}
+        className="antialiased bg-zinc-950 text-zinc-50 min-h-screen flex flex-col"
+        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif' }}
       >
         <AuthWrapper>
           <header className="w-full py-6 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
