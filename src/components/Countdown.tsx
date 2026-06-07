@@ -11,11 +11,8 @@ export default function Countdown() {
   });
 
   useEffect(() => {
-    // Arbitrary future date for the trip (e.g. next month)
-    const targetDate = new Date();
-    targetDate.setMonth(targetDate.getMonth() + 1);
-    targetDate.setDate(15);
-    targetDate.setHours(17, 0, 0, 0);
+    // Día 13 de Junio de 2026
+    const targetDate = new Date('2026-06-13T17:00:00');
 
     const interval = setInterval(() => {
       const now = new Date();

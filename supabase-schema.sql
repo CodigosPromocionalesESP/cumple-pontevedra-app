@@ -1,13 +1,12 @@
 -- Copia y pega esto en el SQL Editor de tu proyecto Supabase para crear las tablas necesarias
 
--- Tabla de Usuarios/Perfiles
-CREATE TABLE public.profiles (
+-- 1. CREACIÓN DE TABLAS
+CREATE TABLE IF NOT EXISTS public.profiles (
   nickname text PRIMARY KEY,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Tabla de Coches
-CREATE TABLE public.cars (
+CREATE TABLE IF NOT EXISTS public.cars (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   driver text REFERENCES public.profiles(nickname) NOT NULL,
   total_seats integer NOT NULL,
@@ -21,8 +20,7 @@ CREATE TABLE public.cars (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Tabla de Plan de Comidas
-CREATE TABLE public.meals (
+CREATE TABLE IF NOT EXISTS public.meals (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   name text NOT NULL,
   description text,
@@ -30,8 +28,7 @@ CREATE TABLE public.meals (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Tabla de Lista de la Compra
-CREATE TABLE public.shopping_list (
+CREATE TABLE IF NOT EXISTS public.shopping_list (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   item text NOT NULL,
   checked boolean DEFAULT false NOT NULL,
@@ -39,8 +36,7 @@ CREATE TABLE public.shopping_list (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Tabla de Gastos
-CREATE TABLE public.expenses (
+CREATE TABLE IF NOT EXISTS public.expenses (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   payer text REFERENCES public.profiles(nickname) NOT NULL,
   amount numeric(10,2) NOT NULL,
@@ -48,16 +44,66 @@ CREATE TABLE public.expenses (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Habilitar Realtime para todas las tablas
-ALTER PUBLICATION supabase_realtime ADD TABLE cars;
-ALTER PUBLICATION supabase_realtime ADD TABLE meals;
-ALTER PUBLICATION supabase_realtime ADD TABLE shopping_list;
-ALTER PUBLICATION supabase_realtime ADD TABLE expenses;
+-- 2. HABILITAR WEBSOCKETS (REALTIME)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'cars') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE cars;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'meals') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE meals;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'shopping_list') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE shopping_list;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'expenses') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE expenses;
+  END IF;
+END $$;
 
--- (Opcional) Políticas RLS - Para este proyecto interno podríamos dejarlas públicas o crear políticas básicas
--- Por simplicidad en un proyecto de amigos de fin de semana, podrías deshabilitar RLS o hacer todo público:
--- ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
--- ALTER TABLE cars DISABLE ROW LEVEL SECURITY;
--- ALTER TABLE meals DISABLE ROW LEVEL SECURITY;
--- ALTER TABLE shopping_list DISABLE ROW LEVEL SECURITY;
--- ALTER TABLE expenses DISABLE ROW LEVEL SECURITY;
+-- 3. HABILITAR RLS Y MEDIDAS DE SEGURIDAD EXTREMAS
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cars ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.meals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shopping_list ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
+
+-- Limpiar políticas anteriores por si acaso
+DROP POLICY IF EXISTS "Lectura pública" ON public.profiles;
+DROP POLICY IF EXISTS "Inserción pública" ON public.profiles;
+DROP POLICY IF EXISTS "Actualización pública" ON public.profiles;
+DROP POLICY IF EXISTS "Lectura pública" ON public.cars;
+DROP POLICY IF EXISTS "Inserción pública" ON public.cars;
+DROP POLICY IF EXISTS "Actualización pública" ON public.cars;
+DROP POLICY IF EXISTS "Lectura pública" ON public.meals;
+DROP POLICY IF EXISTS "Inserción pública" ON public.meals;
+DROP POLICY IF EXISTS "Actualización pública" ON public.meals;
+DROP POLICY IF EXISTS "Lectura pública" ON public.shopping_list;
+DROP POLICY IF EXISTS "Inserción pública" ON public.shopping_list;
+DROP POLICY IF EXISTS "Actualización pública" ON public.shopping_list;
+DROP POLICY IF EXISTS "Lectura pública" ON public.expenses;
+DROP POLICY IF EXISTS "Inserción pública" ON public.expenses;
+DROP POLICY IF EXISTS "Actualización pública" ON public.expenses;
+
+-- POLÍTICAS DE LECTURA: Todos pueden ver todo (App pública)
+CREATE POLICY "Lectura pública" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Lectura pública" ON public.cars FOR SELECT USING (true);
+CREATE POLICY "Lectura pública" ON public.meals FOR SELECT USING (true);
+CREATE POLICY "Lectura pública" ON public.shopping_list FOR SELECT USING (true);
+CREATE POLICY "Lectura pública" ON public.expenses FOR SELECT USING (true);
+
+-- POLÍTICAS DE INSERCIÓN: Todos pueden añadir datos
+CREATE POLICY "Inserción pública" ON public.profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Inserción pública" ON public.cars FOR INSERT WITH CHECK (true);
+CREATE POLICY "Inserción pública" ON public.meals FOR INSERT WITH CHECK (true);
+CREATE POLICY "Inserción pública" ON public.shopping_list FOR INSERT WITH CHECK (true);
+CREATE POLICY "Inserción pública" ON public.expenses FOR INSERT WITH CHECK (true);
+
+-- POLÍTICAS DE ACTUALIZACIÓN: Se puede actualizar (para unirse a coches, tachar compra)
+CREATE POLICY "Actualización pública" ON public.shopping_list FOR UPDATE USING (true);
+CREATE POLICY "Actualización pública" ON public.cars FOR UPDATE USING (true);
+CREATE POLICY "Actualización pública" ON public.meals FOR UPDATE USING (true);
+
+-- ATENCIÓN: NO SE CREA NINGUNA POLÍTICA "FOR DELETE". 
+-- ESTO SIGNIFICA QUE NADIE, NUNCA, PUEDE BORRAR UNA FILA A TRAVÉS DE LA API.
+-- (Cero bromas de amigos borrando la base de datos entera).
